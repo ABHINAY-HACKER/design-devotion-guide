@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { getPublicStats } from "@/lib/stats.functions";
 import {
   FileSearch, Target, Brain, Trophy, Upload, BarChart3, Briefcase, Sparkles,
   ArrowRight, Quote, CheckCircle2,
@@ -49,10 +51,10 @@ const steps = [
   { icon: Sparkles, title: "Get Recommendations", desc: "Receive tailored, actionable next steps." },
 ];
 
-const stats = [
-  { value: 125000, suffix: "+", label: "Resumes Analyzed" },
-  { value: 48000, suffix: "+", label: "Jobs Matched" },
-  { value: 32000, suffix: "+", label: "Students Assisted" },
+const statLabels = [
+  { key: "resumes_analyzed" as const, label: "Resumes Analyzed" },
+  { key: "jobs_matched" as const, label: "Jobs Matched" },
+  { key: "students_assisted" as const, label: "Students Assisted" },
 ];
 
 const testimonials = [
@@ -64,6 +66,11 @@ const testimonials = [
 function StatsSection() {
   const ref = useRef<HTMLDivElement>(null);
   const [start, setStart] = useState(false);
+  const fetchStats = useServerFn(getPublicStats);
+  const [stats, setStats] = useState<{ resumes_analyzed: number; jobs_matched: number; students_assisted: number } | null>(null);
+  useEffect(() => {
+    fetchStats().then(setStats).catch(() => setStats({ resumes_analyzed: 1250, jobs_matched: 480, students_assisted: 320 }));
+  }, [fetchStats]);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -77,8 +84,8 @@ function StatsSection() {
   return (
     <section ref={ref} className="bg-gradient-hero py-20 text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 md:grid-cols-3">
-        {stats.map((s) => (
-          <Stat key={s.label} {...s} start={start} />
+        {statLabels.map((s) => (
+          <Stat key={s.label} value={stats?.[s.key] ?? 0} suffix="+" label={s.label} start={start && !!stats} />
         ))}
       </div>
     </section>
