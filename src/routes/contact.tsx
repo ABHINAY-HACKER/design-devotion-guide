@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, ChevronDown } from "lucide-react";
+import { Mail, Phone, MapPin, Send, ChevronDown, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { submitContact } from "@/lib/contact.functions";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -22,7 +24,29 @@ const faqs = [
 ];
 
 function Contact() {
+  const submit = useServerFn(submitContact);
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await submit({ data: { name, email, subject, message } });
+      setSent(true);
+      setName(""); setEmail(""); setSubject(""); setMessage("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <>
@@ -56,25 +80,28 @@ function Contact() {
       <section className="mx-auto max-w-6xl px-6 py-10">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Form */}
-          <form
-            onSubmit={(e) => { e.preventDefault(); setSent(true); }}
-            className="rounded-2xl bg-card p-8 shadow-card"
-          >
+          <form onSubmit={onSubmit} className="rounded-2xl bg-card p-8 shadow-card">
             <h2 className="font-heading text-2xl font-bold">Send us a message</h2>
             <div className="mt-6 space-y-4">
-              <Field label="Name" type="text" />
-              <Field label="Email" type="email" />
-              <Field label="Subject" type="text" />
+              <Field label="Name" type="text" value={name} onChange={setName} />
+              <Field label="Email" type="email" value={email} onChange={setEmail} />
+              <Field label="Subject" type="text" value={subject} onChange={setSubject} required={false} />
               <div>
                 <label className="text-sm font-medium text-foreground">Message</label>
                 <textarea
                   required rows={5}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  minLength={5}
+                  maxLength={5000}
                   className="mt-1 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </div>
-              <button type="submit" className="btn-primary w-full justify-center">
-                <Send className="h-4 w-4" /> Send Message
+              <button type="submit" disabled={busy} className="btn-primary w-full justify-center">
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {busy ? "Sending…" : "Send Message"}
               </button>
+              {error && <p className="text-center text-sm text-destructive">{error}</p>}
               {sent && (
                 <p className="text-center text-sm font-medium text-[color:var(--success)]">
                   Thanks! We'll get back to you within 24 hours.
@@ -97,12 +124,23 @@ function Contact() {
   );
 }
 
-function Field({ label, type }: { label: string; type: string }) {
+function Field({
+  label, type, value, onChange, required = true,
+}: {
+  label: string;
+  type: string;
+  value: string;
+  onChange: (v: string) => void;
+  required?: boolean;
+}) {
   return (
     <div>
       <label className="text-sm font-medium text-foreground">{label}</label>
       <input
-        required type={type}
+        required={required}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
       />
     </div>

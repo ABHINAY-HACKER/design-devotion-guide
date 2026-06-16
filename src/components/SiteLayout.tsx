@@ -2,6 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/resumeiq-logo.png.asset.json";
+import { UserMenu } from "./UserMenu";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -36,7 +37,8 @@ export function SiteLayout() {
               </Link>
             ))}
           </nav>
-          <div className="hidden md:block">
+          <div className="hidden items-center gap-4 md:flex">
+            <UserMenu />
             <Link to="/resume-analysis" className="btn-primary text-sm">Get Started</Link>
           </div>
           <button
