@@ -11,7 +11,6 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteLayout } from "../components/SiteLayout";
-import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -82,10 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "ResumeIQ helps students and job seekers optimize resumes, detect skill gaps, and match against job descriptions with AI." },
       { name: "author", content: "ResumeIQ" },
       { property: "og:title", content: "ResumeIQ — AI-Powered Resume Analysis & Job Matching" },
-      { property: "og:description", content: "Optimize resumes, detect skill gaps, and match against job descriptions with AI." },
+      { property: "og:description", content: "ResumeIQ helps students and job seekers optimize resumes, detect skill gaps, and match against job descriptions with AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "ResumeIQ — AI-Powered Resume Analysis & Job Matching" },
+      { name: "twitter:description", content: "ResumeIQ helps students and job seekers optimize resumes, detect skill gaps, and match against job descriptions with AI." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8926750d-d275-4144-bcda-51e9c152dbb7" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8926750d-d275-4144-bcda-51e9c152dbb7" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -119,15 +122,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
-  useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
-        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-      }
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
