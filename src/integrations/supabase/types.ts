@@ -16,49 +16,82 @@ export type Database = {
     Tables: {
       analyses: {
         Row: {
+          ats_score: number
           created_at: string
+          employability_score: number
+          existing_skills: Json
           file_name: string
           file_path: string | null
+          hiring_readiness_score: number
           id: string
+          interview_tips: Json
           job_description: string | null
+          learning_path: Json
           match_score: number
           matched_skills: Json
           missing_skills: Json
+          readiness_score: number
           recommendations: Json
+          recommended_certifications: Json
+          recommended_skills: Json
           resume_strength: number
           skill_coverage: number
+          strengths: Json
           summary: string | null
           user_id: string
+          weaknesses: Json
         }
         Insert: {
+          ats_score?: number
           created_at?: string
+          employability_score?: number
+          existing_skills?: Json
           file_name: string
           file_path?: string | null
+          hiring_readiness_score?: number
           id?: string
+          interview_tips?: Json
           job_description?: string | null
+          learning_path?: Json
           match_score?: number
           matched_skills?: Json
           missing_skills?: Json
+          readiness_score?: number
           recommendations?: Json
+          recommended_certifications?: Json
+          recommended_skills?: Json
           resume_strength?: number
           skill_coverage?: number
+          strengths?: Json
           summary?: string | null
           user_id: string
+          weaknesses?: Json
         }
         Update: {
+          ats_score?: number
           created_at?: string
+          employability_score?: number
+          existing_skills?: Json
           file_name?: string
           file_path?: string | null
+          hiring_readiness_score?: number
           id?: string
+          interview_tips?: Json
           job_description?: string | null
+          learning_path?: Json
           match_score?: number
           matched_skills?: Json
           missing_skills?: Json
+          readiness_score?: number
           recommendations?: Json
+          recommended_certifications?: Json
+          recommended_skills?: Json
           resume_strength?: number
           skill_coverage?: number
+          strengths?: Json
           summary?: string | null
           user_id?: string
+          weaknesses?: Json
         }
         Relationships: []
       }
@@ -116,15 +149,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -251,6 +311,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
