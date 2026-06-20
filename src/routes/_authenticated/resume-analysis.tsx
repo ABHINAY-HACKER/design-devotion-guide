@@ -19,8 +19,19 @@ type Result = {
   match_score: number;
   resume_strength: number;
   skill_coverage: number;
+  ats_score: number;
+  readiness_score: number;
+  employability_score: number;
+  hiring_readiness_score: number;
   matched_skills: string[];
   missing_skills: string[];
+  existing_skills: string[];
+  recommended_skills: string[];
+  strengths: string[];
+  weaknesses: string[];
+  learning_path: string[];
+  recommended_certifications: string[];
+  interview_tips: string[];
   recommendations: string[];
   summary: string | null;
   file_name: string;
@@ -74,8 +85,19 @@ function ResumeAnalysis() {
         match_score: row.match_score,
         resume_strength: row.resume_strength,
         skill_coverage: row.skill_coverage,
+        ats_score: row.ats_score ?? 0,
+        readiness_score: row.readiness_score ?? 0,
+        employability_score: row.employability_score ?? 0,
+        hiring_readiness_score: row.hiring_readiness_score ?? 0,
         matched_skills: (row.matched_skills as string[]) ?? [],
         missing_skills: (row.missing_skills as string[]) ?? [],
+        existing_skills: (row.existing_skills as string[]) ?? [],
+        recommended_skills: (row.recommended_skills as string[]) ?? [],
+        strengths: (row.strengths as string[]) ?? [],
+        weaknesses: (row.weaknesses as string[]) ?? [],
+        learning_path: (row.learning_path as string[]) ?? [],
+        recommended_certifications: (row.recommended_certifications as string[]) ?? [],
+        interview_tips: (row.interview_tips as string[]) ?? [],
         recommendations: (row.recommendations as string[]) ?? [],
         summary: row.summary,
         file_name: row.file_name,
@@ -165,10 +187,14 @@ function ResumeAnalysis() {
             <div className="card-hover rounded-2xl bg-card p-8 shadow-card animate-fade-up">
               <h2 className="font-heading text-2xl font-bold">Analysis Result</h2>
               {result.summary && <p className="mt-2 text-sm text-muted-foreground">{result.summary}</p>}
-              <div className="mt-6 grid gap-6 md:grid-cols-3">
+              <div className="mt-6 grid gap-6 md:grid-cols-3 lg:grid-cols-4">
                 <ResultStat label="Match Score" value={result.match_score} color="var(--primary)" />
+                <ResultStat label="ATS Score" value={result.ats_score} color="var(--secondary)" />
                 <ResultStat label="Resume Strength" value={result.resume_strength} color="var(--secondary)" />
                 <ResultStat label="Skill Coverage" value={result.skill_coverage} color="var(--success)" />
+                <ResultStat label="Industry Readiness" value={result.readiness_score} color="var(--primary)" />
+                <ResultStat label="Employability" value={result.employability_score} color="var(--success)" />
+                <ResultStat label="Hiring Readiness" value={result.hiring_readiness_score} color="var(--warning)" />
               </div>
             </div>
           </section>
@@ -177,6 +203,18 @@ function ResumeAnalysis() {
             <div className="grid gap-6 md:grid-cols-2">
               <SkillCard title="Matched Skills" items={result.matched_skills} good />
               <SkillCard title="Missing Skills" items={result.missing_skills} />
+              <SkillCard title="All Resume Skills" items={result.existing_skills} good />
+              <SkillCard title="Recommended Skills" items={result.recommended_skills} />
+            </div>
+          </section>
+
+          <section className="mx-auto max-w-5xl px-6 py-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <BulletCard title="Strengths" items={result.strengths} tone="good" />
+              <BulletCard title="Weaknesses" items={result.weaknesses} tone="warn" />
+              <BulletCard title="Learning Path" items={result.learning_path} numbered />
+              <BulletCard title="Recommended Certifications" items={result.recommended_certifications} />
+              <BulletCard title="Interview Tips" items={result.interview_tips} />
             </div>
           </section>
 
@@ -199,6 +237,26 @@ function ResumeAnalysis() {
         </>
       )}
     </>
+  );
+}
+
+function BulletCard({ title, items, tone, numbered }: { title: string; items: string[]; tone?: "good" | "warn"; numbered?: boolean }) {
+  if (!items || items.length === 0) return null;
+  const color = tone === "warn" ? "var(--warning)" : tone === "good" ? "var(--success)" : "var(--primary)";
+  return (
+    <div className="card-hover rounded-2xl bg-card p-6 shadow-card">
+      <h3 className="font-heading text-lg font-semibold" style={{ color }}>{title}</h3>
+      <ol className="mt-3 space-y-2 text-sm">
+        {items.map((it, i) => (
+          <li key={i} className="flex gap-3">
+            <span className="mt-1 inline-flex h-5 w-5 flex-none items-center justify-center rounded-full text-xs font-bold" style={{ background: `color-mix(in oklab, ${color} 14%, transparent)`, color }}>
+              {numbered ? i + 1 : "•"}
+            </span>
+            <span className="text-foreground">{it}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
