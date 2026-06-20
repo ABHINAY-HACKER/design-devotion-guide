@@ -62,9 +62,9 @@ function Contact() {
       <section className="mx-auto max-w-6xl px-6 py-8">
         <div className="grid gap-6 lg:grid-cols-3">
           {[
-            { icon: Mail, label: "Email", value: "hello@resumeiq.app" },
-            { icon: Phone, label: "Phone", value: "+1 (555) 123-4567" },
-            { icon: MapPin, label: "Location", value: "San Francisco, CA" },
+            { icon: Mail, label: "Email", value: "resumeiq.support@gmail.com" },
+            { icon: Phone, label: "Phone", value: "+91 63053 34148" },
+            { icon: MapPin, label: "Location", value: "Suryapet, Telangana, India" },
           ].map((c) => (
             <div key={c.label} className="card-hover rounded-2xl bg-card p-6 shadow-card">
               <div className="icon-hover inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent">

@@ -9,6 +9,7 @@ const navItems = [
   { to: "/about", label: "About" },
   { to: "/features", label: "Features" },
   { to: "/resume-analysis", label: "Resume Analysis" },
+  { to: "/dashboard", label: "Dashboard" },
   { to: "/contact", label: "Contact" },
 ];
 
@@ -96,9 +97,9 @@ export function SiteLayout() {
           <div>
             <h4 className="text-sm font-semibold text-background">Contact</h4>
             <ul className="mt-4 space-y-2 text-sm text-background/70">
-              <li>hello@resumeiq.app</li>
-              <li>+1 (555) 123-4567</li>
-              <li>San Francisco, CA</li>
+              <li>resumeiq.support@gmail.com</li>
+              <li>+91 63053 34148</li>
+              <li>Suryapet, Telangana, India</li>
             </ul>
           </div>
         </div>
