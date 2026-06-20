@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { FileText, Trash2, ArrowRight, Loader2 } from "lucide-react";
+import { FileText, Trash2, ArrowRight, Loader2, Download } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { listMyAnalyses, deleteAnalysis } from "@/lib/resume.functions";
+import { generateReport } from "@/lib/report.functions";
 
 export const Route = createFileRoute("/_authenticated/history")({
   head: () => ({
@@ -24,8 +25,10 @@ type Row = {
 function History() {
   const list = useServerFn(listMyAnalyses);
   const remove = useServerFn(deleteAnalysis);
+  const makeReport = useServerFn(generateReport);
   const [rows, setRows] = useState<Row[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [reporting, setReporting] = useState<string | null>(null);
 
   useEffect(() => {
     list().then((r) => setRows(r as Row[])).catch(() => setRows([]));
@@ -36,6 +39,21 @@ function History() {
     await remove({ data: { id } });
     setRows((rs) => rs?.filter((r) => r.id !== id) ?? []);
     setBusy(null);
+  };
+
+  const onDownload = async (id: string, fileName: string) => {
+    setReporting(id);
+    try {
+      const { url } = await makeReport({ data: { analysisId: id } });
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ResumeIQ-${fileName.replace(/\.[^.]+$/, "")}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } finally {
+      setReporting(null);
+    }
   };
 
   return (
@@ -78,6 +96,14 @@ function History() {
               <span className="rounded-full bg-[color:var(--success)]/10 px-3 py-1 text-sm font-semibold text-[color:var(--success)]">
                 {r.match_score}% match
               </span>
+              <button
+                onClick={() => onDownload(r.id, r.file_name)}
+                disabled={reporting === r.id}
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline disabled:opacity-40"
+              >
+                {reporting === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                PDF
+              </button>
               <button
                 onClick={() => onDelete(r.id)}
                 disabled={busy === r.id}
