@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, Sparkles, Loader2, Briefcase } from "lucide-react";
+import { UploadCloud, FileText, CheckCircle2, AlertCircle, Sparkles, Loader2, Briefcase, Download } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeResume } from "@/lib/resume.functions";
+import { generateReport } from "@/lib/report.functions";
 
 export const Route = createFileRoute("/_authenticated/resume-analysis")({
   head: () => ({
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/resume-analysis")({
 });
 
 type Result = {
+  id: string;
   match_score: number;
   resume_strength: number;
   skill_coverage: number;
@@ -39,9 +41,11 @@ type Result = {
 
 function ResumeAnalysis() {
   const analyze = useServerFn(analyzeResume);
+  const makeReport = useServerFn(generateReport);
   const [file, setFile] = useState<File | null>(null);
   const [jd, setJd] = useState("");
   const [busy, setBusy] = useState(false);
+  const [reporting, setReporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -82,6 +86,7 @@ function ResumeAnalysis() {
         data: { filePath, fileName: file.name, jobDescription: jd.trim() },
       });
       setResult({
+        id: row.id,
         match_score: row.match_score,
         resume_strength: row.resume_strength,
         skill_coverage: row.skill_coverage,
@@ -106,6 +111,25 @@ function ResumeAnalysis() {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const downloadReport = async () => {
+    if (!result) return;
+    setReporting(true);
+    setError(null);
+    try {
+      const { url } = await makeReport({ data: { analysisId: result.id } });
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ResumeIQ-${result.file_name.replace(/\.[^.]+$/, "")}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not generate report");
+    } finally {
+      setReporting(false);
     }
   };
 
@@ -185,7 +209,13 @@ function ResumeAnalysis() {
         <>
           <section className="mx-auto max-w-5xl px-6 py-6">
             <div className="card-hover rounded-2xl bg-card p-8 shadow-card animate-fade-up">
-              <h2 className="font-heading text-2xl font-bold">Analysis Result</h2>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-heading text-2xl font-bold">Analysis Result</h2>
+                <button onClick={downloadReport} disabled={reporting} className="btn-primary" type="button">
+                  {reporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                  {reporting ? "Generating…" : "Download PDF Report"}
+                </button>
+              </div>
               {result.summary && <p className="mt-2 text-sm text-muted-foreground">{result.summary}</p>}
               <div className="mt-6 grid gap-6 md:grid-cols-3 lg:grid-cols-4">
                 <ResultStat label="Match Score" value={result.match_score} color="var(--primary)" />
