@@ -97,7 +97,7 @@ export function SiteLayout() {
           <div>
             <h4 className="text-sm font-semibold text-background">Contact</h4>
             <ul className="mt-4 space-y-2 text-sm text-background/70">
-              <li>resumeiq.support@gmail.com</li>
+              <li>resumeiq.helpdesk@gmail.com</li>
               <li>+91 63053 34148</li>
               <li>Suryapet, Telangana, India</li>
             </ul>
