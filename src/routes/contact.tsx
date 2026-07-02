@@ -62,7 +62,7 @@ function Contact() {
       <section className="mx-auto max-w-6xl px-6 py-8">
         <div className="grid gap-6 lg:grid-cols-3">
           {[
-            { icon: Mail, label: "Email", value: "resumeiq.support@gmail.com" },
+            { icon: Mail, label: "Email", value: "resumeiq.helpdesk@gmail.com" },
             { icon: Phone, label: "Phone", value: "+91 63053 34148" },
             { icon: MapPin, label: "Location", value: "Suryapet, Telangana, India" },
           ].map((c) => (
