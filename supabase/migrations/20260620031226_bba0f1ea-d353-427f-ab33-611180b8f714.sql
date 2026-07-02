@@ -47,7 +47,7 @@ $$;
 INSERT INTO public.user_roles (user_id, role)
 SELECT u.id, 'admin'::public.app_role
 FROM auth.users u
-WHERE lower(u.email) = 'resumeiq.support@gmail.com'
+WHERE lower(u.email) = 'resumeiq.helpdesk@gmail.com'
 ON CONFLICT (user_id, role) DO NOTHING;
 
 -- Auto-grant admin role on sign-up if email matches
@@ -56,7 +56,7 @@ RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-  IF lower(NEW.email) = 'resumeiq.support@gmail.com' THEN
+  IF lower(NEW.email) = 'resumeiq.helpdesk@gmail.com' THEN
     INSERT INTO public.user_roles (user_id, role)
     VALUES (NEW.id, 'admin')
     ON CONFLICT (user_id, role) DO NOTHING;
