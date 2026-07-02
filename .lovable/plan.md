@@ -9,7 +9,7 @@ ResumeIQ is an AI-powered resume platform with:
 - Optional Job Description → match score, matched/missing skills, candidate ranking
 - Downloadable PDF report of each analysis
 - History of past analyses, per-user dashboard with stats
-- Contact form → stored in DB + email notification to `resumeiq.support@gmail.com`
+- Contact form → stored in DB + email notification to `resumeiq.helpdesk@gmail.com`
 - Admin dashboard (admin email only) showing users, resumes, analyses, messages
 - Production-grade security: RLS, role table, HIBP, Zod validation, no service-role leakage
 
@@ -47,7 +47,7 @@ Requires email domain. Two sub-steps:
 1. `email_domain--check_email_domain_status`; if none, prompt user via setup dialog
 2. After domain ready:
    - `setup_email_infra` → `scaffold_auth_email_templates` (branded signup/recovery/magic-link)
-   - `scaffold_transactional_email` → app email template `contact-notification` sent to `resumeiq.support@gmail.com` whenever contact form is submitted
+   - `scaffold_transactional_email` → app email template `contact-notification` sent to `resumeiq.helpdesk@gmail.com` whenever contact form is submitted
 - Enable Supabase email confirmation (disable auto-confirm) + HIBP password check via `configure_auth`
 
 ### Phase D — Polish & security
@@ -99,7 +99,7 @@ Components: `SiteLayout`, `UserMenu`, score cards, skill-chip lists, PDF button.
 ### 4.4 Auth Flow
 1. User signs up (email+password or Google)
 2. Trigger `handle_new_user` → profile row
-3. Trigger `grant_admin_on_signup` → admin role iff email = `resumeiq.support@gmail.com`
+3. Trigger `grant_admin_on_signup` → admin role iff email = `resumeiq.helpdesk@gmail.com`
 4. Supabase sends branded confirmation email (after Phase C)
 5. `_authenticated/route.tsx` gate redirects unauth → `/auth`
 
@@ -155,7 +155,7 @@ Client → `uploadAndAnalyze({ file, jobDescription? })`
 ## 8. Open Questions
 1. **Email domain**: do you own a domain we can delegate a subdomain from (e.g. `notify.yourdomain.com`) for branded auth + contact-notification emails? If not, Phase C is deferred and contact submissions stay DB-only.
 2. **PDF library**: confirm `@react-pdf/renderer` is acceptable (Worker-safe, programmatic layout). Alternative is an HTML-template approach but it needs an external service on Workers.
-3. **Admin seeding**: confirm `resumeiq.support@gmail.com` is the only admin and you'll sign up with it once so the trigger assigns the role.
+3. **Admin seeding**: confirm `resumeiq.helpdesk@gmail.com` is the only admin and you'll sign up with it once so the trigger assigns the role.
 4. **Email confirmation**: turn on required email confirmation now (users must verify before signing in), or keep auto-confirm until Phase C ships?
 
 Reply with answers (or "go" to accept defaults: React-PDF, defer Phase C until you provide a domain, single admin email as listed, keep auto-confirm until branded emails are ready) and I'll start Phase A.
